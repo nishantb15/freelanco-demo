@@ -1,5 +1,7 @@
 package com.freelanco.freelancoproject.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +20,40 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 	
-	public User getUser(int id) {
-		return userRepository.findById(id).get();
+	public ResponseEntity<User> getUser(int id) {
+		Optional<User> o_user = userRepository.findById(id);
+		
+		if (o_user.isPresent()) {
+			return new ResponseEntity<User>(o_user.get(), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 	
-	public User getUser(String name) {
-		return userRepository.findByUsername(name);
+	public ResponseEntity<User> getUser(String name) {
+		Optional<User> o_user = userRepository.findByUsername(name);
+		
+		if (o_user.isPresent()) {
+			return new ResponseEntity<User>(o_user.get(), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	public ResponseEntity<List<User>> getAllUsers() {
+		try {
+			List<User> users = new ArrayList<User>();
+			
+			userRepository.findAll().forEach(users::add);
+			
+			if (users.isEmpty()) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+			
+			return new ResponseEntity<>(users, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@Transactional
@@ -53,6 +83,7 @@ public class UserService {
 			
 	}
 	
+	@Transactional
 	public ResponseEntity<HttpStatus> deleteUser(int id) {
 		try {
 			userRepository.deleteById(id);
@@ -62,6 +93,7 @@ public class UserService {
 		}
 	}
 	
+	@Transactional
 	public ResponseEntity<HttpStatus> deleteAllUsers() {
 		try {
 			userRepository.deleteAll();

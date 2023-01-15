@@ -1,5 +1,7 @@
 package com.freelanco.freelancoproject.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,13 +29,18 @@ public class UserController {
 	private int pincode;
 	
 	@GetMapping(value="{id}", produces=MediaType.APPLICATION_JSON_VALUE)
-	private User getUserById(@PathVariable int id) {
+	private ResponseEntity<User> getUserById(@PathVariable int id) {
 		return userService.getUser(id);
 	}
 	
 	@GetMapping(value="", produces=MediaType.APPLICATION_JSON_VALUE)
 	private ResponseEntity<User> getUserByName(@RequestParam String name) {
-		return new ResponseEntity<User>(userService.getUser(name), HttpStatus.OK);
+		return userService.getUser(name);
+	}
+	
+	@GetMapping(value="/all")
+	private ResponseEntity<List<User>> getAllUsers() {
+		return userService.getAllUsers();
 	}
 	
 	@PostMapping(value="/create", consumes=MediaType.APPLICATION_JSON_VALUE)
